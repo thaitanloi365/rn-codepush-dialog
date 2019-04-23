@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "allowUnreachableCode": false,
+    "checkJs": true,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "allowUnusedLabels": false,
+    "module": "commonjs",
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true,
+    "strict": true,
+    "noUnusedParameters": true,
+    "noResolve": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true
+  },
+  "exclude": ["node_modules"]
+}
