@@ -7,9 +7,21 @@ declare module "rn-codepush-dialog" {
     ImageSourcePropType,
     ViewStyle,
     ImageProps,
-    Animated
+    Animated,
+    ImageStyle
   } from "react-native";
   import { RemotePackage } from "react-native-code-push";
+
+  interface ProgressBarProps extends ViewProps {
+    progressBarContainerStyle?: StyleProp<ViewStyle>;
+    progressBarStyle?: StyleProp<ViewStyle>;
+    progressBarColor?: string;
+    progressBarThickness?: number;
+    progressTextStyle?: StyleProp<TextStyle>;
+    progressStatusStyle?: StyleProp<TextStyle>;
+    isHiddenProgressText?: boolean;
+    progress: number;
+  }
 
   interface CodePushDialogState {
     isMandatory: boolean;
@@ -22,23 +34,55 @@ declare module "rn-codepush-dialog" {
     animatedScaleValue: Animated.Value;
   }
 
+  type TitleStates = "None" | "Syncing" | "Update" | "Updated";
+  type OptionTexts =
+    | "UpdateConfirmText"
+    | "UpdatedText"
+    | "UpdateMandantoryText"
+    | "RestartConfirmText";
+
   interface CodePushDialogProps extends ViewProps {
-    title?: string;
+    modalBackgroundColor?: string;
+    deploymentKey?: string;
     titleStyle?: StyleProp<TextStyle>;
+    headerContainerStyle?: StyleProp<ViewStyle>;
+    bodyContainerStyle?: StyleProp<ViewStyle>;
+    bottomContainerStyle?: StyleProp<ViewStyle>;
     imageHeaderSource?: ImageSourcePropType;
-    imageHeaderStyle?: StyleProp<ViewStyle>;
-    imageHeaderProps?: ImageProps;
+    imageHeaderStyle?: StyleProp<ImageStyle>;
+    imageHeaderContainerStyle?: StyleProp<ViewStyle>;
     versionTextStyle?: StyleProp<TextStyle>;
+    versionTextContainerStyle?: StyleProp<ViewStyle>;
+    isHiddenDescription?: boolean;
     descriptionTitle?: string;
     descriptionTitleStyle?: StyleProp<TextStyle>;
     descriptionContainerStyle?: StyleProp<ViewStyle>;
     descriptionTextStyle?: StyleProp<TextStyle>;
-    progressBarColor?: string;
+    progressBarContainerStyle?: StyleProp<ViewStyle>;
     progressBarStyle?: StyleProp<ViewStyle>;
+    progressBarColor?: string;
+    progressBarThickness?: number;
     progressTextStyle?: StyleProp<TextStyle>;
+    progressStatusStyle?: StyleProp<TextStyle>;
+    updateLaterButtonStyle?: StyleProp<ViewStyle>;
+    updateLaterButtonText?: string;
+    updateLaterButtonTextStyle?: string;
+    updateNowButtonStyle?: StyleProp<ViewStyle>;
+    updateNowButtonText?: string;
+    updateNowButtonTextStyle?: string;
+    restartNowButtonStyle?: StyleProp<ViewStyle>;
+    restartNowButtonText?: string;
+    restartNowButtonTextStyle?: string;
+    restartLaterButtonStyle?: StyleProp<ViewStyle>;
+    restartLaterButtonText?: string;
+    restartLaterButtonTextStyle?: string;
+    isHiddenProgressText?: boolean;
+    onNewVersionDetected?: (version: string) => void;
+    optionTexts?: { [key: OptionTexts]: string };
+    titleStates?: { [key: TitleStates]: string };
   }
 
-  export class CodePushDialog extends React.Component<
+  export default class CodePushDialog extends React.Component<
     CodePushDialogProps,
     any
   > {}

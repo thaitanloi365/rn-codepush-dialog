@@ -12,11 +12,7 @@
     "noEmit": true,
     "strict": true,
     "noUnusedParameters": true,
-    "noResolve": true,
-    "noUnusedLocals": true,
-    "strictNullChecks": true,
-    "strictBindCallApply": true,
-    "strictFunctionTypes": true
+    "noUnusedLocals": true
   },
   "exclude": ["node_modules"]
 }
