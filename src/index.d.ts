@@ -32,6 +32,8 @@ declare module "rn-codepush-dialog" {
     animatedProgressValue: Animated.Value;
     animatedOpacityValue: Animated.Value;
     animatedScaleValue: Animated.Value;
+    descriptionTextScrollEnable: boolean;
+    showContent: boolean;
   }
 
   type TitleStates = "None" | "Syncing" | "Update" | "Updated";
@@ -39,11 +41,12 @@ declare module "rn-codepush-dialog" {
     | "UpdateConfirmText"
     | "UpdatedText"
     | "UpdateMandantoryText"
-    | "RestartConfirmText";
+    | "RestartConfirmText"
+    | "RestartMandantoryText";
 
   interface CodePushDialogProps extends ViewProps {
-    modalBackgroundColor?: string;
     deploymentKey?: string;
+    animationType?: "scale" | "slide";
     titleStyle?: StyleProp<TextStyle>;
     headerContainerStyle?: StyleProp<ViewStyle>;
     bodyContainerStyle?: StyleProp<ViewStyle>;
@@ -54,6 +57,7 @@ declare module "rn-codepush-dialog" {
     versionTextStyle?: StyleProp<TextStyle>;
     versionTextContainerStyle?: StyleProp<ViewStyle>;
     isHiddenDescription?: boolean;
+    descriptionContentMaxHeight?: number;
     descriptionTitle?: string;
     descriptionTitleStyle?: StyleProp<TextStyle>;
     descriptionContainerStyle?: StyleProp<ViewStyle>;
@@ -80,6 +84,7 @@ declare module "rn-codepush-dialog" {
     onNewVersionDetected?: (version: string) => void;
     optionTexts?: { [key: OptionTexts]: string };
     titleStates?: { [key: TitleStates]: string };
+    isCheckOnResume?: boolean;
   }
 
   export default class CodePushDialog extends React.Component<
