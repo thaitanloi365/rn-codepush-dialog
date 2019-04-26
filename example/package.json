@@ -6,8 +6,10 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
     "ios:": "react-native run-ios",
-    "cps": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Staging -m",
-    "cpp": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Production -m"
+    "cpsm": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Staging -m",
+    "cppm": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Production -m",
+    "cps": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Staging",
+    "cpp": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Production"
   },
   "dependencies": {
     "react": "16.8.3",
