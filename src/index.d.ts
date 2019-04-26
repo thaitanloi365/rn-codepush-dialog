@@ -53,7 +53,7 @@ declare module "rn-codepush-dialog" {
     | "UpdateIgnored"
     | "UpdateInstalled"
     | "UnknowError";
-  interface CodePushDialogProps extends ViewProps {
+  interface CodePushDialogProps {
     modalBackgroundColor?: string;
     deploymentKey?: string;
     animationType?: "scale" | "slide";
