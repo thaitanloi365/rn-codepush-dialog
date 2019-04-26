@@ -44,7 +44,17 @@ declare module "rn-codepush-dialog" {
     | "RestartConfirmText"
     | "RestartMandantoryText";
 
+  type DownloadStatus =
+    | "CheckingForUpdate"
+    | "DownloadingPackage"
+    | "AwaitingUserAction"
+    | "InstallingUpdate"
+    | "UpToDate"
+    | "UpdateIgnored"
+    | "UpdateInstalled"
+    | "UnknowError";
   interface CodePushDialogProps extends ViewProps {
+    modalBackgroundColor?: string;
     deploymentKey?: string;
     animationType?: "scale" | "slide";
     titleStyle?: StyleProp<TextStyle>;
@@ -60,7 +70,6 @@ declare module "rn-codepush-dialog" {
     descriptionContentMaxHeight?: number;
     descriptionTitle?: string;
     descriptionTitleStyle?: StyleProp<TextStyle>;
-    descriptionContainerStyle?: StyleProp<ViewStyle>;
     descriptionTextStyle?: StyleProp<TextStyle>;
     progressBarContainerStyle?: StyleProp<ViewStyle>;
     progressBarStyle?: StyleProp<ViewStyle>;
@@ -70,25 +79,23 @@ declare module "rn-codepush-dialog" {
     progressStatusStyle?: StyleProp<TextStyle>;
     updateLaterButtonStyle?: StyleProp<ViewStyle>;
     updateLaterButtonText?: string;
-    updateLaterButtonTextStyle?: string;
+    updateLaterButtonTextStyle?: StyleProp<TextStyle>;
     updateNowButtonStyle?: StyleProp<ViewStyle>;
     updateNowButtonText?: string;
-    updateNowButtonTextStyle?: string;
+    updateNowButtonTextStyle?: StyleProp<TextStyle>;
     restartNowButtonStyle?: StyleProp<ViewStyle>;
     restartNowButtonText?: string;
-    restartNowButtonTextStyle?: string;
+    restartNowButtonTextStyle?: StyleProp<TextStyle>;
     restartLaterButtonStyle?: StyleProp<ViewStyle>;
     restartLaterButtonText?: string;
-    restartLaterButtonTextStyle?: string;
+    restartLaterButtonTextStyle?: StyleProp<TextStyle>;
     isHiddenProgressText?: boolean;
     onNewVersionDetected?: (version: string) => void;
-    optionTexts?: { [key: OptionTexts]: string };
-    titleStates?: { [key: TitleStates]: string };
+    optionTexts?: { [key in OptionTexts]?: string };
+    titleStates?: { [key in TitleStates]?: string };
+    downloadStatus?: { [key in DownloadStatus]?: string };
     isCheckOnResume?: boolean;
   }
 
-  export default class CodePushDialog extends React.Component<
-    CodePushDialogProps,
-    any
-  > {}
+  export default class CodePushDialog extends React.Component<CodePushDialogProps, any> {}
 }

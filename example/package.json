@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest"
+    "test": "jest",
+    "ios:": "react-native run-ios",
+    "cps": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Staging -m",
+    "cpp": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Production -m"
   },
   "dependencies": {
     "react": "16.8.3",

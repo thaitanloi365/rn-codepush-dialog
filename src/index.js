@@ -20,21 +20,41 @@ const dialogHeight = height * 0.8;
 const progressBarWidth = dialogWidth - 40;
 const isIOS = Platform.OS === "ios";
 const primaryColor = "#007aff";
-const textDarkColor = "#efeff4";
-const textLightColor = "#ffffff";
 const lightBlueGrey = "#dae4f2";
 const slateColor = "#474f61";
 
-const fontMedium = isIOS
-  ? { fontFamily: "Avenir-Medium" }
-  : { fontFamily: "sans-serif" };
+const fontMedium = isIOS ? { fontFamily: "Avenir-Medium" } : { fontFamily: "sans-serif" };
 const fontBold = isIOS
   ? { fontFamily: "Avenir-Heavy" }
   : { fontFamily: "sans-serif", fontWeight: "bold" };
-const fontLight = isIOS
-  ? { fontFamily: "Avenir-Light" }
-  : { fontFamily: "sans-serif-light" };
+const fontLight = isIOS ? { fontFamily: "Avenir-Light" } : { fontFamily: "sans-serif-light" };
 
+const TitleStates = {
+  None: "Update Available !",
+  Syncing: "Update In Progress !",
+  Update: "Update Available !",
+  Updated: "Update Installed !"
+};
+
+const OptionTexts = {
+  UpdateConfirmText: "Do you want to update now ?",
+  UpdateMandantoryText: "Please update to the newest version.",
+  UpdatedText:
+    "The latest version of Rent My Wardrobe is installed. Restart the app for updates to take effect.",
+  RestartConfirmText: "Do you want to restart now ?",
+  RestartMandantoryText: ""
+};
+
+const DownloadStatus = {
+  CheckingForUpdate: "Checking for update.",
+  DownloadingPackage: "Downloading package.",
+  AwaitingUserAction: "Awaiting user action.",
+  InstallingUpdate: "Installing update.",
+  UpToDate: "App up to date.",
+  UpdateIgnored: "Update cancelled by user.",
+  UpdateInstalled: "Update installed and will be applied on restart.",
+  UnknowError: "An unknown error occurred."
+};
 /**
  * @typedef {import("rn-codepush-dialog").CodePushDialogProps} Props
  * @typedef {import("rn-codepush-dialog").CodePushDialogState} State
@@ -62,19 +82,9 @@ class CodePushDialog extends React.Component {
    * @type {Props}
    */
   static defaultProps = {
-    titleStates: {
-      None: "Update Available !",
-      Syncing: "Update In Progress !",
-      Update: "Update Available !",
-      Updated: "Update Installed !"
-    },
-    optionTexts: {
-      UpdateConfirmText: "Do you want to update now ?",
-      UpdateMandantoryText: "Please update newer version.",
-      UpdatedText: "The newest version is installed.",
-      RestartConfirmText: "Do you want to restart now ?",
-      RestartMandantoryText: "Please restart now."
-    },
+    titleStates: TitleStates,
+    optionTexts: OptionTexts,
+    downloadStatus: DownloadStatus,
     modalBackgroundColor: "rgba(35,36,38,0.8)",
     animationType: "scale",
     descriptionContentMaxHeight: 220
@@ -83,7 +93,6 @@ class CodePushDialog extends React.Component {
   componentWillMount() {
     CodePush.disallowRestart();
     CodePush.getUpdateMetadata().then(packageInfo => {
-      console.log("**** CodePushDialog: packageInfo");
       console.log(packageInfo);
       if (packageInfo) {
         const { label, appVersion } = packageInfo;
@@ -149,11 +158,7 @@ class CodePushDialog extends React.Component {
         duration: 250,
         useNativeDriver: true
       })
-    ]).start(() =>
-      this.setState({ showContent: false }, () =>
-        this.setState({ state: "None" })
-      )
-    );
+    ]).start(() => this.setState({ showContent: false }, () => this.setState({ state: "None" })));
   };
 
   _syncImmediate = () => {
@@ -192,34 +197,42 @@ class CodePushDialog extends React.Component {
       });
     }
   };
-
-  _codePushStatusDidChange = (syncStatus: CodePush.SyncStatus) => {
+  /**
+   *
+   * @param {import("rn-codepush-dialog").DownloadStatus} state
+   */
+  _getDownloadStatusFromState(state) {
+    const { downloadStatus } = this.props;
+    // @ts-ignore
+    return downloadStatus[state] || DownloadStatus[state];
+  }
+  _codePushStatusDidChange = syncStatus => {
     let syncMessage = "";
     switch (syncStatus) {
       case CodePush.SyncStatus.CHECKING_FOR_UPDATE:
-        syncMessage = "Checking for update";
+        syncMessage = this._getDownloadStatusFromState("CheckingForUpdate");
         break;
       case CodePush.SyncStatus.DOWNLOADING_PACKAGE:
-        syncMessage = "Downloading package";
+        syncMessage = this._getDownloadStatusFromState("DownloadingPackage");
         break;
       case CodePush.SyncStatus.AWAITING_USER_ACTION:
-        syncMessage = "Awaiting user action";
+        syncMessage = this._getDownloadStatusFromState("AwaitingUserAction");
         break;
       case CodePush.SyncStatus.INSTALLING_UPDATE:
-        syncMessage = "Installing update";
+        syncMessage = this._getDownloadStatusFromState("InstallingUpdate");
         break;
       case CodePush.SyncStatus.UP_TO_DATE:
-        syncMessage = "App up to date.";
+        syncMessage = this._getDownloadStatusFromState("UpToDate");
         break;
       case CodePush.SyncStatus.UPDATE_IGNORED:
-        syncMessage = "Update cancelled by user";
+        syncMessage = this._getDownloadStatusFromState("UpdateIgnored");
         break;
       case CodePush.SyncStatus.UPDATE_INSTALLED:
-        syncMessage = "Update installed and will be applied on restart.";
+        syncMessage = this._getDownloadStatusFromState("UpdateInstalled");
         CodePush.notifyAppReady();
         break;
       case CodePush.SyncStatus.UNKNOWN_ERROR:
-        syncMessage = "An unknown error occurred";
+        syncMessage = this._getDownloadStatusFromState("UnknowError");
         this._hide();
         return;
     }
@@ -227,7 +240,7 @@ class CodePushDialog extends React.Component {
   };
 
   _codePushDownloadDidProgress = progress => {
-    const { state, animatedProgressValue, isMandatory } = this.state;
+    const { state, animatedProgressValue } = this.state;
     if (state === "Syncing") {
       const { receivedBytes, totalBytes } = progress;
       let temp = receivedBytes / totalBytes;
@@ -258,9 +271,7 @@ class CodePushDialog extends React.Component {
             style={[styles.deactiveButton, updateLaterButtonStyle]}
             onPress={this._hide}
           >
-            <Text
-              style={[styles.deactiveButtonText, updateLaterButtonTextStyle]}
-            >
+            <Text style={[styles.deactiveButtonText, updateLaterButtonTextStyle]}>
               {updateLaterButtonText}
             </Text>
           </TouchableOpacity>
@@ -294,9 +305,7 @@ class CodePushDialog extends React.Component {
             style={[styles.deactiveButton, restartLaterButtonStyle]}
             onPress={this._hide}
           >
-            <Text
-              style={[styles.deactiveButtonText, restartLaterButtonTextStyle]}
-            >
+            <Text style={[styles.deactiveButtonText, restartLaterButtonTextStyle]}>
               {restartLaterButtonText}
             </Text>
           </TouchableOpacity>
@@ -315,7 +324,6 @@ class CodePushDialog extends React.Component {
 
   _renderProgressBar = () => {
     const {
-      style,
       progressBarContainerStyle,
       progressBarStyle,
       progressTextStyle,
@@ -354,15 +362,11 @@ class CodePushDialog extends React.Component {
               animationStyle
             ]}
           />
-          <Animated.Text
-            style={[styles.progress, progressTextStyle, { color }]}
-          >
+          <Animated.Text style={[styles.progress, progressTextStyle, { color }]}>
             {progress}
           </Animated.Text>
         </View>
-        <Text style={[styles.syncMessage, progressStatusStyle]}>
-          {syncMessage}
-        </Text>
+        <Text style={[styles.syncMessage, progressStatusStyle]}>{syncMessage}</Text>
       </View>
     );
   };
@@ -378,8 +382,8 @@ class CodePushDialog extends React.Component {
       versionTextStyle,
       versionTextContainerStyle
     } = this.props;
-    const { state, isMandatory } = this.state;
-    const title = titleStates[state];
+    const { state } = this.state;
+    const title = titleStates[state] || TitleStates[state];
     const version = this._getVersion();
     return (
       <View style={[headerContainerStyle]}>
@@ -394,31 +398,29 @@ class CodePushDialog extends React.Component {
             style={[styles.versionContainer, versionTextContainerStyle]}
             activeOpacity={0.7}
           >
-            <Text style={[styles.version, versionTextStyle]}>
-              {versionTextStyle}
-            </Text>
+            <Text style={[styles.version, versionTextStyle]}>{versionTextStyle}</Text>
           </TouchableOpacity>
         )}
       </View>
     );
   };
 
+  _getTextFromState(state) {
+    const { optionTexts } = this.props;
+    //@ts-ignore
+    return optionTexts[state] || OptionTexts[state];
+  }
   _renderBody = () => {
     const { state, isMandatory } = this.state;
-    const { optionTexts } = this.props;
-    const {
-      UpdatedText,
-      RestartConfirmText,
-      UpdateConfirmText,
-      UpdateMandantoryText,
-      RestartMandantoryText
-    } = optionTexts;
+
     if (state === "Updated") {
       return (
         <View style={styles.contentContainer}>
-          <Text style={styles.descriptionTitle}>{UpdatedText}</Text>
+          <Text style={styles.descriptionTitle}>{this._getTextFromState("UpdatedText")}</Text>
           <Text style={styles.confirmRestartText}>
-            {isMandatory ? RestartMandantoryText : RestartConfirmText}
+            {isMandatory
+              ? this._getTextFromState("RestartMandantoryText")
+              : this._getTextFromState("RestartConfirmText")}
           </Text>
         </View>
       );
@@ -428,7 +430,9 @@ class CodePushDialog extends React.Component {
       <View style={styles.contentContainer}>
         {this._renderDescription()}
         <Text style={styles.confirmText}>
-          {isMandatory ? UpdateMandantoryText : UpdateConfirmText}
+          {isMandatory
+            ? this._getTextFromState("UpdateMandantoryText")
+            : this._getTextFromState("UpdateConfirmText")}
         </Text>
       </View>
     );
@@ -438,8 +442,7 @@ class CodePushDialog extends React.Component {
     if (nativeEvent && nativeEvent.contentSize) {
       const { descriptionContentMaxHeight } = this.props;
       const { descriptionTextScrollEnable } = this.state;
-      const scrollEnabled =
-        nativeEvent.contentSize.height > descriptionContentMaxHeight;
+      const scrollEnabled = nativeEvent.contentSize.height > descriptionContentMaxHeight;
       if (scrollEnabled !== descriptionTextScrollEnable) {
         this.setState({ descriptionTextScrollEnable: scrollEnabled });
       }
@@ -448,7 +451,6 @@ class CodePushDialog extends React.Component {
   _renderDescription = () => {
     const {
       bodyContainerStyle,
-      descriptionContainerStyle,
       descriptionTextStyle,
       descriptionTitle = "What's new",
       descriptionTitleStyle,
@@ -457,14 +459,11 @@ class CodePushDialog extends React.Component {
     } = this.props;
 
     const { updateInfo, descriptionTextScrollEnable } = this.state;
-    if (isHiddenDescription || !updateInfo || !updateInfo.description)
-      return null;
+    if (isHiddenDescription || !updateInfo || !updateInfo.description) return null;
 
     return (
       <View style={[{ marginBottom: 20 }, bodyContainerStyle]}>
-        <Text style={[styles.descriptionTitle, descriptionTitleStyle]}>
-          {descriptionTitle}
-        </Text>
+        <Text style={[styles.descriptionTitle, descriptionTitleStyle]}>{descriptionTitle}</Text>
         <TextInput
           scrollEnabled={descriptionTextScrollEnable}
           editable={false}
@@ -494,11 +493,7 @@ class CodePushDialog extends React.Component {
       bottomView = this._renderProgressBar();
     }
 
-    return (
-      <View style={[styles.bottomContainer, bottomContainerStyle]}>
-        {bottomView}
-      </View>
-    );
+    return <View style={[styles.bottomContainer, bottomContainerStyle]}>{bottomView}</View>;
   };
 
   _getVersion = () => {
@@ -528,7 +523,8 @@ class CodePushDialog extends React.Component {
       });
 
       const scaleStyle = {
-        transform: [{ scale }]
+        transform: [{ scale }],
+        opacity
       };
 
       return scaleStyle;
@@ -551,12 +547,7 @@ class CodePushDialog extends React.Component {
     return slideAnimationStyle;
   };
   render() {
-    const {
-      animatedOpacityValue,
-      animatedScaleValue,
-      state,
-      showContent
-    } = this.state;
+    const { animatedOpacityValue, animatedScaleValue, state, showContent } = this.state;
     const { modalBackgroundColor } = this.props;
     const visible = state !== "None";
 
@@ -576,9 +567,7 @@ class CodePushDialog extends React.Component {
           style={[
             styles.modal,
             {
-              backgroundColor: showContent
-                ? modalBackgroundColor
-                : "transparent"
+              backgroundColor: showContent ? modalBackgroundColor : "transparent"
             },
             opacityStyle
           ]}
