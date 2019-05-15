@@ -34,6 +34,7 @@ declare module "rn-codepush-dialog" {
     animatedScaleValue: Animated.Value;
     descriptionTextScrollEnable: boolean;
     showContent: boolean;
+    updateLater: boolean;
   }
 
   type TitleStates = "None" | "Syncing" | "Update" | "Updated";

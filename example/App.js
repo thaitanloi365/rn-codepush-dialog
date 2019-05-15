@@ -24,7 +24,7 @@ export default class App extends Component {
     return (
       <View style={styles.container}>
         <CodePushDialog isCheckOnResume deploymentKey={deploymentKey} />
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
+        <Text style={styles.welcome}>Welcome to React Native 4!</Text>
         <Text style={styles.instructions}>To get started, edit App.js</Text>
         <Text style={styles.instructions}>{instructions}</Text>
       </View>
