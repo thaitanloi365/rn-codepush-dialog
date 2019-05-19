@@ -24,7 +24,9 @@ const lightBlueGrey = "#dae4f2";
 const slateColor = "#474f61";
 
 const fontMedium = isIOS ? { fontFamily: "Avenir-Medium" } : { fontFamily: "sans-serif" };
-const fontBold = isIOS ? { fontFamily: "Avenir-Heavy" } : { fontFamily: "sans-serif", fontWeight: "bold" };
+const fontBold = isIOS
+  ? { fontFamily: "Avenir-Heavy" }
+  : { fontFamily: "sans-serif", fontWeight: "bold" };
 const fontLight = isIOS ? { fontFamily: "Avenir-Light" } : { fontFamily: "sans-serif-light" };
 
 const TitleStates = {
@@ -37,7 +39,8 @@ const TitleStates = {
 const OptionTexts = {
   UpdateConfirmText: "Do you want to update now ?",
   UpdateMandantoryText: "Please update to the newest version.",
-  UpdatedText: "The latest version of Rent My Wardrobe is installed. Restart the app for updates to take effect.",
+  UpdatedText:
+    "The latest version of Rent My Wardrobe is installed. Restart the app for updates to take effect.",
   RestartConfirmText: "Do you want to restart now ?",
   RestartMandantoryText: ""
 };
@@ -107,7 +110,6 @@ class CodePushDialog extends React.Component {
     AppState.removeEventListener("change", this._handleAppStateChange);
   }
   componentDidMount() {
-    CodePush.notifyAppReady();
     CodePush.allowRestart();
     this._syncImmediate();
     if (this.props.isCheckOnResume) {
@@ -195,7 +197,11 @@ class CodePushDialog extends React.Component {
           mandatoryInstallMode: CodePush.InstallMode.ON_NEXT_RESTART,
           deploymentKey: deploymentKey
         };
-        CodePush.sync(codePushOptions, this._codePushStatusDidChange, this._codePushDownloadDidProgress);
+        CodePush.sync(
+          codePushOptions,
+          this._codePushStatusDidChange,
+          this._codePushDownloadDidProgress
+        );
       });
     }
   };
@@ -230,7 +236,6 @@ class CodePushDialog extends React.Component {
         syncMessage = this._getDownloadStatusFromState("UpdateIgnored");
         break;
       case CodePush.SyncStatus.UPDATE_INSTALLED:
-        CodePush.notifyAppReady();
         syncMessage = this._getDownloadStatusFromState("UpdateInstalled");
         break;
       case CodePush.SyncStatus.UNKNOWN_ERROR:
@@ -274,12 +279,22 @@ class CodePushDialog extends React.Component {
     return (
       <View style={styles.row}>
         {!isMandatory && (
-          <TouchableOpacity style={[styles.deactiveButton, updateLaterButtonStyle]} onPress={this._updateLater}>
-            <Text style={[styles.deactiveButtonText, updateLaterButtonTextStyle]}>{updateLaterButtonText}</Text>
+          <TouchableOpacity
+            style={[styles.deactiveButton, updateLaterButtonStyle]}
+            onPress={this._updateLater}
+          >
+            <Text style={[styles.deactiveButtonText, updateLaterButtonTextStyle]}>
+              {updateLaterButtonText}
+            </Text>
           </TouchableOpacity>
         )}
-        <TouchableOpacity style={[styles.activeButton, updateNowButtonStyle]} onPress={this._immediateUpdate}>
-          <Text style={[styles.activeButtonText, updateNowButtonTextStyle]}>{updateNowButtonText}</Text>
+        <TouchableOpacity
+          style={[styles.activeButton, updateNowButtonStyle]}
+          onPress={this._immediateUpdate}
+        >
+          <Text style={[styles.activeButtonText, updateNowButtonTextStyle]}>
+            {updateNowButtonText}
+          </Text>
         </TouchableOpacity>
       </View>
     );
@@ -298,12 +313,22 @@ class CodePushDialog extends React.Component {
     return (
       <View style={styles.row}>
         {!isMandatory && (
-          <TouchableOpacity style={[styles.deactiveButton, restartLaterButtonStyle]} onPress={this._hide}>
-            <Text style={[styles.deactiveButtonText, restartLaterButtonTextStyle]}>{restartLaterButtonText}</Text>
+          <TouchableOpacity
+            style={[styles.deactiveButton, restartLaterButtonStyle]}
+            onPress={this._hide}
+          >
+            <Text style={[styles.deactiveButtonText, restartLaterButtonTextStyle]}>
+              {restartLaterButtonText}
+            </Text>
           </TouchableOpacity>
         )}
-        <TouchableOpacity style={[styles.activeButton, restartNowButtonStyle]} onPress={this._restartNow}>
-          <Text style={[styles.activeButtonText, restartNowButtonTextStyle]}>{restartNowButtonText}</Text>
+        <TouchableOpacity
+          style={[styles.activeButton, restartNowButtonStyle]}
+          onPress={this._restartNow}
+        >
+          <Text style={[styles.activeButtonText, restartNowButtonTextStyle]}>
+            {restartNowButtonText}
+          </Text>
         </TouchableOpacity>
       </View>
     );
@@ -349,7 +374,9 @@ class CodePushDialog extends React.Component {
               animationStyle
             ]}
           />
-          <Animated.Text style={[styles.progress, progressTextStyle, { color }]}>{progress}</Animated.Text>
+          <Animated.Text style={[styles.progress, progressTextStyle, { color }]}>
+            {progress}
+          </Animated.Text>
         </View>
         <Text style={[styles.syncMessage, progressStatusStyle]}>{syncMessage}</Text>
       </View>
@@ -379,7 +406,10 @@ class CodePushDialog extends React.Component {
         )}
         <Text style={[styles.title, titleStyle]}>{title}</Text>
         {version && (
-          <TouchableOpacity style={[styles.versionContainer, versionTextContainerStyle]} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={[styles.versionContainer, versionTextContainerStyle]}
+            activeOpacity={0.7}
+          >
             <Text style={[styles.version, versionTextStyle]}>{versionTextStyle}</Text>
           </TouchableOpacity>
         )}
@@ -412,7 +442,9 @@ class CodePushDialog extends React.Component {
       <View style={styles.contentContainer}>
         {this._renderDescription()}
         <Text style={styles.confirmText}>
-          {isMandatory ? this._getTextFromState("UpdateMandantoryText") : this._getTextFromState("UpdateConfirmText")}
+          {isMandatory
+            ? this._getTextFromState("UpdateMandantoryText")
+            : this._getTextFromState("UpdateConfirmText")}
         </Text>
       </View>
     );
@@ -449,7 +481,11 @@ class CodePushDialog extends React.Component {
           editable={false}
           underlineColorAndroid="transparent"
           onContentSizeChange={this._onTextDescriptionLayout}
-          style={[styles.description, descriptionTextStyle, { maxHeight: descriptionContentMaxHeight }]}
+          style={[
+            styles.description,
+            descriptionTextStyle,
+            { maxHeight: descriptionContentMaxHeight }
+          ]}
           multiline
         >
           {updateInfo.description}

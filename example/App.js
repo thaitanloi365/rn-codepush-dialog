@@ -8,7 +8,7 @@ const instructions = Platform.select({
 });
 
 const isIOS = Platform.OS === "ios";
-const productionKey_iOS = "U_Xbg7oGM9CuxvJUFJQKfzAsb4LKBywfc0054";
+const productionKey_iOS = "Wr7cgCTDbWfOzv1yTWwAghrPZxrXSk58Wfin4";
 const stagingKey_iOS = "nkXEfEa2S1t-NojVVzL2UHNDe_Q6rkGVqCA5N";
 
 const productionKey_android = "gOCsmKHfjk4uAeO7ZkZJqcI3pcZmHkdOqAR5E";
