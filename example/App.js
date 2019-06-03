@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { Platform, Text, View, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import CodePushDialog from "rn-codepush-dialog";
 
 const instructions = Platform.select({
@@ -20,13 +20,36 @@ const productionKey = isIOS ? productionKey_iOS : productionKey_android;
 const deploymentKey = __DEV__ ? stagingKey : productionKey;
 
 export default class App extends Component {
+  state = {
+    packageVersion: "",
+    packageInfo: null
+  };
   render() {
     return (
       <View style={styles.container}>
-        <CodePushDialog isCheckOnResume deploymentKey={deploymentKey} />
-        <Text style={styles.welcome}>Welcome to React Native 4!</Text>
+        <Text style={styles.welcome}>Welcome to React Native 9!</Text>
         <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        {this.state.packageInfo !== null && (
+          <Text style={styles.instructions}>{JSON.stringify(this.state.packageInfo)}</Text>
+        )}
+        <Text style={styles.instructions}>{"version: " + this.state.packageVersion}</Text>
+        <CodePushDialog
+          isCheckOnResume
+          deploymentKey={deploymentKey}
+          onGetPackageInfo={(packageVersion, packageInfo) => {
+            console.log({ packageVersion }, packageInfo);
+            this.setState({ packageVersion });
+          }}
+        />
+        <TouchableOpacity
+          onPress={() => {
+            if (this.state.packageInfo) {
+              Alert.alert("Package info", JSON.stringify(this.state.packageInfo));
+            }
+          }}
+        >
+          <Text>show package information</Text>
+        </TouchableOpacity>
       </View>
     );
   }

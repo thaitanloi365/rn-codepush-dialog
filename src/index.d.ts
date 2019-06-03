@@ -91,7 +91,7 @@ declare module "rn-codepush-dialog" {
     restartLaterButtonText?: string;
     restartLaterButtonTextStyle?: StyleProp<TextStyle>;
     isHiddenProgressText?: boolean;
-    onNewVersionDetected?: (version: string) => void;
+    onGetPackageInfo?: (version: string, packgeInfo?: RemotePackage) => void;
     optionTexts?: { [key in OptionTexts]?: string };
     titleStates?: { [key in TitleStates]?: string };
     downloadStatus?: { [key in DownloadStatus]?: string };

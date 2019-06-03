@@ -9,7 +9,9 @@
     "cpsm": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Staging -m",
     "cppm": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Production -m",
     "cps": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Staging",
-    "cpp": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Production"
+    "cpp": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Production",
+    "codepush_list_deployment_ios": "appcenter codepush deployment list -a thaitanloi365/Test-iOS -k",
+    "codepush_list_deployment_android": "appcenter codepush deployment list -a thaitanloi365/Test-iOS -k"
   },
   "dependencies": {
     "react": "16.8.3",
