@@ -651,7 +651,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   headerContainer: {
-    marginBottom: 30
+    marginBottom: 15
   },
   syncMessage: {
     marginTop: 6,
