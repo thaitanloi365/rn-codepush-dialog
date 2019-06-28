@@ -43,6 +43,7 @@ const OptionTexts = {
   UpdatedText: "The latest version of Rent My Wardrobe is installed. Restart the app for updates to take effect.",
   RestartConfirmText: "Do you want to restart now ?",
   RestartMandantoryText: "",
+  UpdateText: "The newer version of Rent My Wardrobe is available.",
   NeedUpdateStoreText: "The latest version of Rent My Wardrobe is available."
 };
 
@@ -78,7 +79,6 @@ class CodePushDialog extends React.Component {
     descriptionTextScrollEnable: false,
     showContent: true,
     updateLater: false,
-    needStoreUpdate: false,
     storeUrl: ""
   };
 
@@ -450,6 +450,7 @@ class CodePushDialog extends React.Component {
     //@ts-ignore
     return optionTexts[state] || OptionTexts[state];
   }
+
   _renderBody = () => {
     const { state, isMandatory } = this.state;
 
@@ -477,6 +478,7 @@ class CodePushDialog extends React.Component {
 
     return (
       <View style={styles.contentContainer}>
+        <Text style={styles.descriptionTitle}>{this._getTextFromState("UpdateText")}</Text>
         {this._renderDescription()}
         <Text style={styles.confirmText}>
           {isMandatory ? this._getTextFromState("UpdateMandantoryText") : this._getTextFromState("UpdateConfirmText")}
@@ -597,7 +599,7 @@ class CodePushDialog extends React.Component {
   };
 
   render() {
-    const { animatedOpacityValue, animatedScaleValue, state, showContent } = this.state;
+    const { animatedOpacityValue, state, showContent } = this.state;
     const { modalBackgroundColor } = this.props;
     const visible = state !== "None";
 
