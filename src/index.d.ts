@@ -41,10 +41,11 @@ declare module "rn-codepush-dialog" {
   type TitleStates = "None" | "Syncing" | "Update" | "Updated";
   type OptionTexts =
     | "UpdateConfirmText"
-    | "UpdatedText"
     | "UpdateMandantoryText"
-    | "RestartConfirmText"
-    | "RestartMandantoryText";
+    | "UpdatedText"
+    | "RestartMandantoryText"
+    | "UpdateText"
+    | "NeedUpdateStoreText";
 
   type DownloadStatus =
     | "CheckingForUpdate"
