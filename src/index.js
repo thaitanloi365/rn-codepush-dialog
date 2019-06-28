@@ -701,6 +701,7 @@ const styles = StyleSheet.create({
   descriptionTitle: {
     fontSize: 18,
     color: slateColor,
+    marginBottom: 5,
     ...fontMedium
   },
   description: {
@@ -760,8 +761,6 @@ const styles = StyleSheet.create({
     ...fontMedium
   },
   confirmText: {
-    alignSelf: "center",
-    textAlign: "center",
     fontSize: 18,
     color: slateColor,
     marginBottom: 10,
