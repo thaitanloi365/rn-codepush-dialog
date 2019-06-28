@@ -17,6 +17,7 @@
     "react-native-code-push": "^5.6.0"
   },
   "dependencies": {
-    "react-native-code-push": "^5.6.0"
+    "react-native-code-push": "^5.6.0",
+    "react-native-version-check": "^3.3.0"
   }
 }

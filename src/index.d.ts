@@ -28,13 +28,14 @@ declare module "rn-codepush-dialog" {
     updateInfo: RemotePackage | null;
     currentProgress: number;
     syncMessage: string;
-    state: "None" | "Updated" | "Syncing" | "Update";
+    state: "None" | "Updated" | "Syncing" | "Update" | "NeedStoreUpdate";
     animatedProgressValue: Animated.Value;
     animatedOpacityValue: Animated.Value;
     animatedScaleValue: Animated.Value;
     descriptionTextScrollEnable: boolean;
     showContent: boolean;
     updateLater: boolean;
+    storeUrl: string;
   }
 
   type TitleStates = "None" | "Syncing" | "Update" | "Updated";
@@ -54,6 +55,12 @@ declare module "rn-codepush-dialog" {
     | "UpdateIgnored"
     | "UpdateInstalled"
     | "UnknowError";
+
+  type StoreInfo = {
+    isNeeded: boolean;
+    currentVersion: string;
+    latestVersion: string;
+  };
 
   interface CodePushDialogProps {
     modalBackgroundColor?: string;
@@ -96,6 +103,11 @@ declare module "rn-codepush-dialog" {
     titleStates?: { [key in TitleStates]?: string };
     downloadStatus?: { [key in DownloadStatus]?: string };
     isCheckOnResume?: boolean;
+    allowStoreCheck?: boolean;
+    storeAppID?: string;
+    storeAppppName?: string;
+    storeIgnoreErrors?: boolean;
+    onGetStoreInfo?: (info: StoreInfo) => void;
     onStatusDidChange?: (status) => void;
     onGetCurrentPackageInfo?: (version: string, packgeInfo?: LocalPackage) => void;
     onGetRemotePackageInfo?: (version: string, packgeInfo?: RemotePackage) => void;

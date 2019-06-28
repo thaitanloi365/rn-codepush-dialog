@@ -10,9 +10,11 @@ import {
   TouchableOpacity,
   TextInput,
   Dimensions,
-  AppState
+  AppState,
+  Linking
 } from "react-native";
 import CodePush from "react-native-code-push";
+import VersionCheck from "react-native-version-check";
 
 const { width, height } = Dimensions.get("window");
 const dialogWidth = width - 20;
@@ -31,7 +33,8 @@ const TitleStates = {
   None: "Update Available !",
   Syncing: "Update In Progress !",
   Update: "Update Available !",
-  Updated: "Update Installed !"
+  Updated: "Update Installed !",
+  NeedStoreUpdate: "Update Available !"
 };
 
 const OptionTexts = {
@@ -39,7 +42,8 @@ const OptionTexts = {
   UpdateMandantoryText: "Please update to the newest version.",
   UpdatedText: "The latest version of Rent My Wardrobe is installed. Restart the app for updates to take effect.",
   RestartConfirmText: "Do you want to restart now ?",
-  RestartMandantoryText: ""
+  RestartMandantoryText: "",
+  NeedUpdateStoreText: "The latest version of Rent My Wardrobe is available."
 };
 
 const DownloadStatus = {
@@ -73,7 +77,9 @@ class CodePushDialog extends React.Component {
     animatedScaleValue: new Animated.Value(0),
     descriptionTextScrollEnable: false,
     showContent: true,
-    updateLater: false
+    updateLater: false,
+    needStoreUpdate: false,
+    storeUrl: ""
   };
 
   /**
@@ -85,7 +91,8 @@ class CodePushDialog extends React.Component {
     downloadStatus: DownloadStatus,
     modalBackgroundColor: "rgba(35,36,38,0.8)",
     animationType: "scale",
-    descriptionContentMaxHeight: 220
+    descriptionContentMaxHeight: 220,
+    allowStoreCheck: true
   };
 
   componentWillMount() {
@@ -109,7 +116,7 @@ class CodePushDialog extends React.Component {
 
   componentDidMount() {
     CodePush.allowRestart();
-    this._syncImmediate();
+    this._handleAppStateChange("active");
     if (this.props.isCheckOnResume) {
       AppState.addEventListener("change", this._handleAppStateChange);
     }
@@ -123,7 +130,39 @@ class CodePushDialog extends React.Component {
 
   _handleAppStateChange = nextAppState => {
     if (nextAppState === "active" && this.state.state === "None") {
-      this._syncImmediate();
+      const {
+        allowStoreCheck,
+        onGetStoreInfo,
+        storeAppID: appID,
+        storeAppppName: appName,
+        storeIgnoreErrors: ignoreErrors = true
+      } = this.props;
+      if (allowStoreCheck && appID !== "") {
+        let info = null;
+        let storeUrl = null;
+        VersionCheck.needUpdate()
+          .then(res => {
+            info = res;
+            onGetStoreInfo && onGetStoreInfo(res);
+            return VersionCheck.getStoreUrl({ appID, appName, ignoreErrors });
+          })
+          .then(url => {
+            if (!info.isNeeded || !url) throw Error("No need to update store, will fallback to check code push");
+            storeUrl = url;
+            return Linking.canOpenURL(url);
+          })
+          .then(canOpen => {
+            if (!canOpen) throw Error("Can't open store url, will fallback to check code push");
+            console.log("*** need update store: ", storeUrl);
+            this.setState({ storeUrl, state: "NeedStoreUpdate", showContent: true }, this._show);
+          })
+          .catch(error => {
+            console.log("**** error", error);
+            this._syncImmediate();
+          });
+      } else {
+        this._syncImmediate();
+      }
     }
   };
 
@@ -196,17 +235,27 @@ class CodePushDialog extends React.Component {
   };
 
   _immediateUpdate = () => {
-    const { state } = this.state;
+    const { state, storeUrl } = this.state;
     const { deploymentKey } = this.props;
-    if (state !== "Syncing") {
-      this.setState({ state: "Syncing" }, () => {
-        const codePushOptions = {
-          installMode: CodePush.InstallMode.ON_NEXT_RESTART,
-          mandatoryInstallMode: CodePush.InstallMode.ON_NEXT_RESTART,
-          deploymentKey: deploymentKey
-        };
-        CodePush.sync(codePushOptions, this._codePushStatusDidChange, this._codePushDownloadDidProgress);
-      });
+    if (state === "NeedStoreUpdate") {
+      Linking.openURL(storeUrl)
+        .then(res => {
+          console.log("**** res", res);
+        })
+        .catch(error => {
+          console.log("**** error", error);
+        });
+    } else {
+      if (state !== "Syncing") {
+        this.setState({ state: "Syncing" }, () => {
+          const codePushOptions = {
+            installMode: CodePush.InstallMode.ON_NEXT_RESTART,
+            mandatoryInstallMode: CodePush.InstallMode.ON_NEXT_RESTART,
+            deploymentKey: deploymentKey
+          };
+          CodePush.sync(codePushOptions, this._codePushStatusDidChange, this._codePushDownloadDidProgress);
+        });
+      }
     }
   };
   /**
@@ -380,7 +429,7 @@ class CodePushDialog extends React.Component {
     const title = titleStates[state] || TitleStates[state];
     const version = this._getVersion();
     return (
-      <View style={[headerContainerStyle]}>
+      <View style={[styles.headerContainer, headerContainerStyle]}>
         {imageHeaderSource && (
           <View style={imageHeaderContainerStyle}>
             <Image style={imageHeaderStyle} source={imageHeaderSource} />
@@ -403,6 +452,15 @@ class CodePushDialog extends React.Component {
   }
   _renderBody = () => {
     const { state, isMandatory } = this.state;
+
+    if (state === "NeedStoreUpdate") {
+      return (
+        <View style={styles.contentContainer}>
+          <Text style={styles.descriptionTitle}>{this._getTextFromState("NeedUpdateStoreText")}</Text>
+          <Text style={styles.confirmRestartText}>{this._getTextFromState("UpdateMandantoryText")}</Text>
+        </View>
+      );
+    }
 
     if (state === "Updated") {
       return (
@@ -437,6 +495,7 @@ class CodePushDialog extends React.Component {
       }
     }
   };
+
   _renderDescription = () => {
     const {
       bodyContainerStyle,
@@ -471,6 +530,11 @@ class CodePushDialog extends React.Component {
     const { state, isMandatory } = this.state;
     const { bottomContainerStyle } = this.props;
     let bottomView = this._renderUpdateButtonOptions(isMandatory);
+
+    if (state === "NeedStoreUpdate") {
+      bottomView = this._renderUpdateButtonOptions(true);
+    }
+
     if (state === "Updated") {
       bottomView = this._renderRestartButtonOptions(isMandatory);
     }
@@ -531,6 +595,7 @@ class CodePushDialog extends React.Component {
     };
     return slideAnimationStyle;
   };
+
   render() {
     const { animatedOpacityValue, animatedScaleValue, state, showContent } = this.state;
     const { modalBackgroundColor } = this.props;
@@ -546,6 +611,7 @@ class CodePushDialog extends React.Component {
     };
 
     const animationType = this._getAnimation();
+
     return (
       <Modal transparent visible={visible}>
         <Animated.View
@@ -575,6 +641,9 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center"
+  },
+  headerContainer: {
+    marginBottom: 30
   },
   syncMessage: {
     marginTop: 6,
