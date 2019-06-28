@@ -10,13 +10,15 @@
     "cppm": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Production -m",
     "cps": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Staging",
     "cpp": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Production",
-    "codepush_list_deployment_ios": "appcenter codepush deployment list -a thaitanloi365/Test-iOS -k",
-    "codepush_list_deployment_android": "appcenter codepush deployment list -a thaitanloi365/Test-iOS -k"
+    "ls": "appcenter codepush deployment list -a thaitanloi365/Test-iOS -k",
+    "als": "appcenter codepush deployment list -a thaitanloi365/Test-iOS -k",
+    "clear": "appcenter codepush deployment clear -a thaitanloi365/Test-iOS -Staging"
   },
   "dependencies": {
     "react": "16.8.3",
     "react-native": "0.59.5",
     "react-native-code-push": "^5.6.0",
+    "react-native-splash-screen": "^3.2.0",
     "rn-codepush-dialog": "../"
   },
   "devDependencies": {

@@ -10,7 +10,7 @@ declare module "rn-codepush-dialog" {
     Animated,
     ImageStyle
   } from "react-native";
-  import { RemotePackage } from "react-native-code-push";
+  import { RemotePackage, LocalPackage } from "react-native-code-push";
 
   interface ProgressBarProps extends ViewProps {
     progressBarContainerStyle?: StyleProp<ViewStyle>;
@@ -54,6 +54,7 @@ declare module "rn-codepush-dialog" {
     | "UpdateIgnored"
     | "UpdateInstalled"
     | "UnknowError";
+
   interface CodePushDialogProps {
     modalBackgroundColor?: string;
     deploymentKey?: string;
@@ -91,11 +92,13 @@ declare module "rn-codepush-dialog" {
     restartLaterButtonText?: string;
     restartLaterButtonTextStyle?: StyleProp<TextStyle>;
     isHiddenProgressText?: boolean;
-    onGetPackageInfo?: (version: string, packgeInfo?: RemotePackage) => void;
     optionTexts?: { [key in OptionTexts]?: string };
     titleStates?: { [key in TitleStates]?: string };
     downloadStatus?: { [key in DownloadStatus]?: string };
     isCheckOnResume?: boolean;
+    onStatusDidChange?: (status) => void;
+    onGetCurrentPackageInfo?: (version: string, packgeInfo?: LocalPackage) => void;
+    onGetRemotePackageInfo?: (version: string, packgeInfo?: RemotePackage) => void;
   }
 
   export default class CodePushDialog extends React.Component<CodePushDialogProps, any> {}

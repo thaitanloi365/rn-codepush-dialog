@@ -94,10 +94,10 @@ class CodePushDialog extends React.Component {
     CodePush.getUpdateMetadata().then(packageInfo => {
       if (packageInfo) {
         const { label, appVersion } = packageInfo;
-        const { onGetPackageInfo } = this.props;
-        if (onGetPackageInfo) {
+        const { onGetCurrentPackageInfo } = this.props;
+        if (onGetCurrentPackageInfo) {
           const version = this._getFormatVersion(label, appVersion);
-          onGetPackageInfo(version, packageInfo);
+          onGetCurrentPackageInfo(version, packageInfo);
         }
       }
     });
@@ -177,10 +177,10 @@ class CodePushDialog extends React.Component {
     CodePush.checkForUpdate(deploymentKey).then(update => {
       if (update && !update.failedInstall) {
         const { label, appVersion, isMandatory } = update;
-        const { onGetPackageInfo } = this.props;
-        if (onGetPackageInfo) {
+        const { onGetRemotePackageInfo } = this.props;
+        if (onGetRemotePackageInfo) {
           const version = this._getFormatVersion(label, appVersion);
-          onGetPackageInfo(version, update);
+          onGetRemotePackageInfo(version, update);
         }
         this.setState(
           {
@@ -235,12 +235,14 @@ class CodePushDialog extends React.Component {
         break;
       case CodePush.SyncStatus.UP_TO_DATE:
         syncMessage = this._getDownloadStatusFromState("UpToDate");
+        this._hide();
         break;
       case CodePush.SyncStatus.UPDATE_IGNORED:
         syncMessage = this._getDownloadStatusFromState("UpdateIgnored");
         break;
       case CodePush.SyncStatus.UPDATE_INSTALLED:
         syncMessage = this._getDownloadStatusFromState("UpdateInstalled");
+        this.setState({ state: "Updated" });
         break;
       case CodePush.SyncStatus.UNKNOWN_ERROR:
         syncMessage = this._getDownloadStatusFromState("UnknowError");
@@ -256,9 +258,7 @@ class CodePushDialog extends React.Component {
       const { receivedBytes, totalBytes } = progress;
       let temp = receivedBytes / totalBytes;
       this.setState({ currentProgress: temp }, () => {
-        if (temp >= 1) {
-          this.setState({ state: "Updated" });
-        } else {
+        if (temp <= 1) {
           animatedProgressValue.setValue(temp);
         }
       });
@@ -707,7 +707,7 @@ const styles = StyleSheet.create({
  */
 const codePushOptions = {
   checkFrequency: CodePush.CheckFrequency.MANUAL,
-  updateDialog: undefined
+  updateDialog: null
 };
 
 export default CodePush(codePushOptions)(CodePushDialog);

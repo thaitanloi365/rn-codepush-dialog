@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Platform, Text, View, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import CodePushDialog from "rn-codepush-dialog";
+import SplashScreen from "react-native-splash-screen";
 
 const instructions = Platform.select({
   ios: "Press Cmd+R to reload,\n" + "Cmd+D or shake for dev menu",
@@ -24,6 +25,9 @@ export default class App extends Component {
     packageVersion: "",
     packageInfo: null
   };
+  componentDidMount() {
+    SplashScreen.hide();
+  }
   render() {
     return (
       <View style={styles.container}>
@@ -36,8 +40,12 @@ export default class App extends Component {
         <CodePushDialog
           isCheckOnResume
           deploymentKey={deploymentKey}
-          onGetPackageInfo={(packageVersion, packageInfo) => {
-            console.log({ packageVersion }, packageInfo);
+          onGetCurrentPackageInfo={(packageVersion, packageInfo) => {
+            console.log("onGetCurrentPackageInfo", { packageVersion }, packageInfo);
+            this.setState({ packageVersion });
+          }}
+          onGetRemotePackageInfo={(packageVersion, packageInfo) => {
+            console.log("onGetRemotePackageInfo", { packageVersion }, packageInfo);
             this.setState({ packageVersion });
           }}
         />
