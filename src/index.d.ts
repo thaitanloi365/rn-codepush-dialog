@@ -105,7 +105,7 @@ declare module "rn-codepush-dialog" {
     isCheckOnResume?: boolean;
     allowStoreCheck?: boolean;
     storeAppID?: string;
-    storeAppppName?: string;
+    storeAppName?: string;
     storeIgnoreErrors?: boolean;
     onGetStoreInfo?: (info: StoreInfo) => void;
     onStatusDidChange?: (status) => void;

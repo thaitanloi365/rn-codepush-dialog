@@ -134,7 +134,7 @@ class CodePushDialog extends React.Component {
         allowStoreCheck,
         onGetStoreInfo,
         storeAppID: appID,
-        storeAppppName: appName,
+        storeAppName: appName,
         storeIgnoreErrors: ignoreErrors = true
       } = this.props;
       if (allowStoreCheck && appID !== "") {
