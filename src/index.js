@@ -92,7 +92,8 @@ class CodePushDialog extends React.Component {
     modalBackgroundColor: "rgba(35,36,38,0.8)",
     animationType: "scale",
     descriptionContentMaxHeight: 220,
-    allowStoreCheck: true
+    allowStoreCheck: true,
+    storeMandatoryUpdate: true
   };
 
   componentWillMount() {
@@ -455,10 +456,15 @@ class CodePushDialog extends React.Component {
     const { state, isMandatory } = this.state;
 
     if (state === "NeedStoreUpdate") {
+      const { storeMandatoryUpdate } = this.props;
       return (
         <View style={styles.contentContainer}>
           <Text style={styles.descriptionTitle}>{this._getTextFromState("NeedUpdateStoreText")}</Text>
-          <Text style={styles.confirmRestartText}>{this._getTextFromState("UpdateMandantoryText")}</Text>
+          <Text style={styles.confirmRestartText}>
+            {storeMandatoryUpdate
+              ? this._getTextFromState("UpdateMandantoryText")
+              : this._getTextFromState("UpdateConfirmText")}
+          </Text>
         </View>
       );
     }
@@ -530,11 +536,11 @@ class CodePushDialog extends React.Component {
 
   _renderBottom = () => {
     const { state, isMandatory } = this.state;
-    const { bottomContainerStyle } = this.props;
+    const { bottomContainerStyle, storeMandatoryUpdate } = this.props;
     let bottomView = this._renderUpdateButtonOptions(isMandatory);
 
     if (state === "NeedStoreUpdate") {
-      bottomView = this._renderUpdateButtonOptions(true);
+      bottomView = this._renderUpdateButtonOptions(storeMandatoryUpdate);
     }
 
     if (state === "Updated") {

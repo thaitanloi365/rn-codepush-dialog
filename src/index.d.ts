@@ -105,6 +105,7 @@ declare module "rn-codepush-dialog" {
     downloadStatus?: { [key in DownloadStatus]?: string };
     isCheckOnResume?: boolean;
     allowStoreCheck?: boolean;
+    storeMandatoryUpdate?: boolean;
     storeAppID?: string;
     storeAppName?: string;
     storeIgnoreErrors?: boolean;
