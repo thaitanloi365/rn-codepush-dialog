@@ -462,7 +462,7 @@ class CodePushDialog extends React.Component {
           <Text style={styles.descriptionTitle}>{this._getTextFromState("NeedUpdateStoreText")}</Text>
           <Text style={styles.confirmRestartText}>
             {storeMandatoryUpdate
-              ? this._getTextFromState("UpdateMandantoryText")
+              ? this._getTextFromState("UpdateMandatoryText")
               : this._getTextFromState("UpdateConfirmText")}
           </Text>
         </View>
