@@ -41,11 +41,12 @@ declare module "rn-codepush-dialog" {
   type TitleStates = "None" | "Syncing" | "Update" | "Updated";
   type OptionTexts =
     | "UpdateConfirmText"
-    | "UpdateMandantoryText"
+    | "UpdateMandatoryText"
     | "UpdatedText"
-    | "RestartMandantoryText"
+    | "RestartMandatoryText"
     | "UpdateText"
-    | "NeedUpdateStoreText";
+    | "NeedUpdateStoreText"
+    | "RestartConfirmText";
 
   type DownloadStatus =
     | "CheckingForUpdate"
@@ -55,7 +56,7 @@ declare module "rn-codepush-dialog" {
     | "UpToDate"
     | "UpdateIgnored"
     | "UpdateInstalled"
-    | "UnknowError";
+    | "UnknownError";
 
   type StoreInfo = {
     isNeeded: boolean;
@@ -111,8 +112,8 @@ declare module "rn-codepush-dialog" {
     storeIgnoreErrors?: boolean;
     onGetStoreInfo?: (info: StoreInfo) => void;
     onStatusDidChange?: (status) => void;
-    onGetCurrentPackageInfo?: (version: string, packgeInfo?: LocalPackage) => void;
-    onGetRemotePackageInfo?: (version: string, packgeInfo?: RemotePackage) => void;
+    onGetCurrentPackageInfo?: (version: string, packageInfo?: LocalPackage) => void;
+    onGetRemotePackageInfo?: (version: string, packageInfo?: RemotePackage) => void;
   }
 
   export default class CodePushDialog extends React.Component<CodePushDialogProps, any> {}

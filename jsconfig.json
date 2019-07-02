@@ -4,7 +4,7 @@
     "allowUnreachableCode": false,
     "checkJs": true,
     "skipLibCheck": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "allowUnusedLabels": false,
     "module": "commonjs",
     "jsx": "react",

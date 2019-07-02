@@ -39,10 +39,10 @@ const TitleStates = {
 
 const OptionTexts = {
   UpdateConfirmText: "Do you want to update now ?",
-  UpdateMandantoryText: "Please update to the newest version.",
+  UpdateMandatoryText: "Please update to the newest version.",
   UpdatedText: "The latest version of Rent My Wardrobe is installed. Restart the app for updates to take effect.",
   RestartConfirmText: "Do you want to restart now ?",
-  RestartMandantoryText: "",
+  RestartMandatoryText: "",
   UpdateText: "The newer version of Rent My Wardrobe is available.",
   NeedUpdateStoreText: "The latest version of Rent My Wardrobe is available."
 };
@@ -55,7 +55,7 @@ const DownloadStatus = {
   UpToDate: "App up to date.",
   UpdateIgnored: "Update cancelled by user.",
   UpdateInstalled: "Update installed and will be applied on restart.",
-  UnknowError: "An unknown error occurred."
+  UnknownError: "An unknown error occurred."
 };
 /**
  * @typedef {import("rn-codepush-dialog").CodePushDialogProps} Props
@@ -475,7 +475,7 @@ class CodePushDialog extends React.Component {
           <Text style={styles.descriptionTitle}>{this._getTextFromState("UpdatedText")}</Text>
           <Text style={styles.confirmRestartText}>
             {isMandatory
-              ? this._getTextFromState("RestartMandantoryText")
+              ? this._getTextFromState("RestartMandatoryText")
               : this._getTextFromState("RestartConfirmText")}
           </Text>
         </View>
@@ -487,7 +487,7 @@ class CodePushDialog extends React.Component {
         <Text style={styles.descriptionTitle}>{this._getTextFromState("UpdateText")}</Text>
         {this._renderDescription()}
         <Text style={styles.confirmText}>
-          {isMandatory ? this._getTextFromState("UpdateMandantoryText") : this._getTextFromState("UpdateConfirmText")}
+          {isMandatory ? this._getTextFromState("UpdateMandatoryText") : this._getTextFromState("UpdateConfirmText")}
         </Text>
       </View>
     );
