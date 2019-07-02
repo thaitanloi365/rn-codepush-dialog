@@ -65,6 +65,7 @@ declare module "rn-codepush-dialog" {
   };
 
   interface CodePushDialogProps {
+    style?: ViewStyle;
     modalBackgroundColor?: string;
     deploymentKey?: string;
     animationType?: "scale" | "slide";

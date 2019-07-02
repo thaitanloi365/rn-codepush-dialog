@@ -607,7 +607,7 @@ class CodePushDialog extends React.Component {
 
   render() {
     const { animatedOpacityValue, state, showContent } = this.state;
-    const { modalBackgroundColor } = this.props;
+    const { modalBackgroundColor, style } = this.props;
     const visible = state !== "None";
 
     const opacity = animatedOpacityValue.interpolate({
@@ -629,7 +629,8 @@ class CodePushDialog extends React.Component {
             {
               backgroundColor: showContent ? modalBackgroundColor : "transparent"
             },
-            opacityStyle
+            opacityStyle,
+            style
           ]}
         >
           {showContent && (
