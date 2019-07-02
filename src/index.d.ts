@@ -28,7 +28,7 @@ declare module "rn-codepush-dialog" {
     updateInfo: RemotePackage | null;
     currentProgress: number;
     syncMessage: string;
-    state: "None" | "Updated" | "Syncing" | "Update" | "NeedStoreUpdate";
+    state: TitleStates;
     animatedProgressValue: Animated.Value;
     animatedOpacityValue: Animated.Value;
     animatedScaleValue: Animated.Value;
@@ -38,7 +38,7 @@ declare module "rn-codepush-dialog" {
     storeUrl: string;
   }
 
-  type TitleStates = "None" | "Syncing" | "Update" | "Updated";
+  type TitleStates = "None" | "Syncing" | "Update" | "Updated" | "NeedStoreUpdate";
   type OptionTexts =
     | "UpdateConfirmText"
     | "UpdateMandatoryText"

@@ -295,7 +295,7 @@ class CodePushDialog extends React.Component {
         this.setState({ state: "Updated" });
         break;
       case CodePush.SyncStatus.UNKNOWN_ERROR:
-        syncMessage = this._getDownloadStatusFromState("UnknowError");
+        syncMessage = this._getDownloadStatusFromState("UnknownError");
         this._hide();
         return;
     }

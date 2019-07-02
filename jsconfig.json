@@ -6,6 +6,7 @@
     "skipLibCheck": true,
     "noImplicitAny": false,
     "allowUnusedLabels": false,
+    "strictNullChecks": false,
     "module": "commonjs",
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
