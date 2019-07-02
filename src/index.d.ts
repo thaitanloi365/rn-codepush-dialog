@@ -81,6 +81,7 @@ declare module "rn-codepush-dialog" {
     descriptionContentMaxHeight?: number;
     descriptionTitle?: string;
     descriptionTitleStyle?: StyleProp<TextStyle>;
+    confirmTextStyle?: StyleProp<TextStyle>;
     descriptionTextStyle?: StyleProp<TextStyle>;
     progressBarContainerStyle?: StyleProp<ViewStyle>;
     progressBarStyle?: StyleProp<ViewStyle>;

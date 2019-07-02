@@ -454,13 +454,14 @@ class CodePushDialog extends React.Component {
 
   _renderBody = () => {
     const { state, isMandatory } = this.state;
-
+    const { descriptionTitleStyle, storeMandatoryUpdate, confirmTextStyle } = this.props;
     if (state === "NeedStoreUpdate") {
-      const { storeMandatoryUpdate } = this.props;
       return (
         <View style={styles.contentContainer}>
-          <Text style={styles.descriptionTitle}>{this._getTextFromState("NeedUpdateStoreText")}</Text>
-          <Text style={styles.confirmRestartText}>
+          <Text style={[styles.descriptionTitle, descriptionTitleStyle]}>
+            {this._getTextFromState("NeedUpdateStoreText")}
+          </Text>
+          <Text style={[styles.confirmRestartText, confirmTextStyle]}>
             {storeMandatoryUpdate
               ? this._getTextFromState("UpdateMandatoryText")
               : this._getTextFromState("UpdateConfirmText")}
@@ -472,8 +473,8 @@ class CodePushDialog extends React.Component {
     if (state === "Updated") {
       return (
         <View style={styles.contentContainer}>
-          <Text style={styles.descriptionTitle}>{this._getTextFromState("UpdatedText")}</Text>
-          <Text style={styles.confirmRestartText}>
+          <Text style={[styles.descriptionTitle, descriptionTitleStyle]}>{this._getTextFromState("UpdatedText")}</Text>
+          <Text style={[styles.confirmRestartText, confirmTextStyle]}>
             {isMandatory
               ? this._getTextFromState("RestartMandatoryText")
               : this._getTextFromState("RestartConfirmText")}
@@ -484,9 +485,9 @@ class CodePushDialog extends React.Component {
 
     return (
       <View style={styles.contentContainer}>
-        <Text style={styles.descriptionTitle}>{this._getTextFromState("UpdateText")}</Text>
+        <Text style={[styles.descriptionTitle, descriptionTitleStyle]}>{this._getTextFromState("UpdateText")}</Text>
         {this._renderDescription()}
-        <Text style={styles.confirmText}>
+        <Text style={[styles.confirmText, confirmTextStyle]}>
           {isMandatory ? this._getTextFromState("UpdateMandatoryText") : this._getTextFromState("UpdateConfirmText")}
         </Text>
       </View>
