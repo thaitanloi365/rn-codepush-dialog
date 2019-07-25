@@ -93,7 +93,9 @@ class CodePushDialog extends React.Component {
     animationType: "scale",
     descriptionContentMaxHeight: 220,
     allowStoreCheck: true,
-    storeMandatoryUpdate: true
+    storeMandatoryUpdate: true,
+    isCodePushSlientUpdate: true,
+    codePushTimeoutForSlientUpdate: 30000
   };
 
   componentWillMount() {
@@ -103,10 +105,12 @@ class CodePushDialog extends React.Component {
       if (packageInfo) {
         const { label, appVersion } = packageInfo;
         const { onGetCurrentPackageInfo } = this.props;
+        const version = this._getFormatVersion(label, appVersion);
         if (onGetCurrentPackageInfo) {
-          const version = this._getFormatVersion(label, appVersion);
           onGetCurrentPackageInfo(version, packageInfo);
         }
+        this.packageInfo = packageInfo;
+        this.version = version;
       }
     });
   }
@@ -118,8 +122,21 @@ class CodePushDialog extends React.Component {
   componentDidMount() {
     CodePush.allowRestart();
     this._handleAppStateChange("active");
-    if (this.props.isCheckOnResume) {
+    const {
+      isCheckOnResume,
+      isCodePushSlientUpdate,
+      onDidCheckUpdate,
+      codePushTimeoutForSlientUpdate = 30000
+    } = this.props;
+    if (isCheckOnResume && !isCodePushSlientUpdate) {
       AppState.addEventListener("change", this._handleAppStateChange);
+    }
+    if (isCodePushSlientUpdate && onDidCheckUpdate) {
+      this.timer = setTimeout(() => {
+        if (!this.updateInProgress) {
+          onDidCheckUpdate(false, this.version, this.packageInfo);
+        }
+      }, codePushTimeoutForSlientUpdate);
     }
   }
 
@@ -207,10 +224,34 @@ class CodePushDialog extends React.Component {
 
   _syncImmediate = () => {
     const { updateLater } = this.state;
-    if (!updateLater) {
-      this._forceSyncImmediate();
+    const { isCodePushSlientUpdate } = this.props;
+    if (isCodePushSlientUpdate) {
+      this._checkAndUpdateImmediate();
+    } else {
+      if (!updateLater) {
+        this._forceSyncImmediate();
+      }
     }
   };
+
+  _checkAndUpdateImmediate() {
+    const { deploymentKey, onDidCheckUpdate } = this.props;
+    CodePush.checkForUpdate(deploymentKey).then(update => {
+      if (update && !update.failedInstall) {
+        const { label, appVersion } = update;
+        const { onGetRemotePackageInfo } = this.props;
+        if (onGetRemotePackageInfo) {
+          const version = this._getFormatVersion(label, appVersion);
+          onGetRemotePackageInfo(version, update);
+        }
+        this._immediateUpdate();
+      } else {
+        if (onDidCheckUpdate) {
+          onDidCheckUpdate(true, this.version, this.packageInfo);
+        }
+      }
+    });
+  }
 
   _forceSyncImmediate = () => {
     const { deploymentKey } = this.props;
@@ -237,7 +278,7 @@ class CodePushDialog extends React.Component {
 
   _immediateUpdate = () => {
     const { state, storeUrl } = this.state;
-    const { deploymentKey } = this.props;
+    const { deploymentKey, isCodePushSlientUpdate } = this.props;
     if (state === "NeedStoreUpdate") {
       Linking.openURL(storeUrl)
         .then(res => {
@@ -247,15 +288,26 @@ class CodePushDialog extends React.Component {
           console.log("**** error", error);
         });
     } else {
-      if (state !== "Syncing") {
+      if (isCodePushSlientUpdate) {
         this.setState({ state: "Syncing" }, () => {
           const codePushOptions = {
-            installMode: CodePush.InstallMode.ON_NEXT_RESTART,
-            mandatoryInstallMode: CodePush.InstallMode.ON_NEXT_RESTART,
+            installMode: CodePush.InstallMode.IMMEDIATE,
+            mandatoryInstallMode: CodePush.InstallMode.IMMEDIATE,
             deploymentKey: deploymentKey
           };
           CodePush.sync(codePushOptions, this._codePushStatusDidChange, this._codePushDownloadDidProgress);
         });
+      } else {
+        if (state !== "Syncing") {
+          this.setState({ state: "Syncing" }, () => {
+            const codePushOptions = {
+              installMode: CodePush.InstallMode.ON_NEXT_RESTART,
+              mandatoryInstallMode: CodePush.InstallMode.ON_NEXT_RESTART,
+              deploymentKey: deploymentKey
+            };
+            CodePush.sync(codePushOptions, this._codePushStatusDidChange, this._codePushDownloadDidProgress);
+          });
+        }
       }
     }
   };
@@ -269,40 +321,57 @@ class CodePushDialog extends React.Component {
     return downloadStatus[state] || DownloadStatus[state];
   }
   _codePushStatusDidChange = syncStatus => {
+    const { isCodePushSlientUpdate } = this.props;
     let syncMessage = "";
     switch (syncStatus) {
       case CodePush.SyncStatus.CHECKING_FOR_UPDATE:
+        this.updateInProgress = false;
         syncMessage = this._getDownloadStatusFromState("CheckingForUpdate");
         break;
       case CodePush.SyncStatus.DOWNLOADING_PACKAGE:
+        this.updateInProgress = true;
         syncMessage = this._getDownloadStatusFromState("DownloadingPackage");
         break;
       case CodePush.SyncStatus.AWAITING_USER_ACTION:
         syncMessage = this._getDownloadStatusFromState("AwaitingUserAction");
         break;
       case CodePush.SyncStatus.INSTALLING_UPDATE:
+        this.updateInProgress = true;
         syncMessage = this._getDownloadStatusFromState("InstallingUpdate");
         break;
       case CodePush.SyncStatus.UP_TO_DATE:
         syncMessage = this._getDownloadStatusFromState("UpToDate");
-        this._hide();
+        this.updateInProgress = true;
+        if (!isCodePushSlientUpdate) {
+          this._hide();
+        }
         break;
       case CodePush.SyncStatus.UPDATE_IGNORED:
         syncMessage = this._getDownloadStatusFromState("UpdateIgnored");
+        this.updateInProgress = true;
         break;
       case CodePush.SyncStatus.UPDATE_INSTALLED:
+        this.updateInProgress = true;
         syncMessage = this._getDownloadStatusFromState("UpdateInstalled");
         this.setState({ state: "Updated" });
         break;
       case CodePush.SyncStatus.UNKNOWN_ERROR:
+        this.updateInProgress = false;
         syncMessage = this._getDownloadStatusFromState("UnknownError");
-        this._hide();
-        return;
+        if (!isCodePushSlientUpdate) {
+          this._hide();
+        }
+        break;
     }
-    this.setState({ syncMessage });
+
+    if (!isCodePushSlientUpdate) {
+      this.setState({ syncMessage });
+    }
   };
 
   _codePushDownloadDidProgress = progress => {
+    if (this.props.isCodePushSlientUpdate) return;
+
     const { state, animatedProgressValue } = this.state;
     if (state === "Syncing") {
       const { receivedBytes, totalBytes } = progress;
