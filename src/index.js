@@ -97,7 +97,7 @@ class CodePushDialog extends React.Component {
     descriptionContentMaxHeight: 220,
     allowStoreCheck: true,
     storeMandatoryUpdate: true,
-    isCodePushSlientUpdate: true,
+    isCodePushSlientUpdate: false,
     codePushTimeoutForSlientUpdate: 30000,
     storeAppID: ""
   };
