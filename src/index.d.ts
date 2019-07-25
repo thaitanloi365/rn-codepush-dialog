@@ -118,7 +118,7 @@ declare module "rn-codepush-dialog" {
     onGetRemotePackageInfo?: (version: string, packageInfo?: RemotePackage) => void;
     isCodePushSlientUpdate?: boolean;
     codePushTimeoutForSlientUpdate?: number;
-    onDidCheckUpdate?: (isLatestVersion: boolean, version: string, packageInfo?: RemotePackage) => void;
+    onDidCheckUpdate?: (isLatestVersion: boolean, version: string, packageInfo?: LocalPackage) => void;
   }
 
   export default class CodePushDialog extends React.Component<CodePushDialogProps, any> {}

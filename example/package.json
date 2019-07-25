@@ -3,32 +3,33 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "start": "react-native start",
     "test": "jest",
-    "ios:": "react-native run-ios",
+    "lint": "eslint .",
     "cpsm": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Staging -m",
     "cppm": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Production -m",
     "cps": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Staging",
     "cpp": "appcenter codepush release-react -a thaitanloi365/Test-iOS -d Production",
     "ls": "appcenter codepush deployment list -a thaitanloi365/Test-iOS -k",
     "als": "appcenter codepush deployment list -a thaitanloi365/Test-iOS -k",
-    "clear": "appcenter codepush deployment clear -a thaitanloi365/Test-iOS -Staging"
+    "clear": "appcenter codepush deployment clear -a thaitanloi365/Test-iOS"
   },
   "dependencies": {
-    "react": "16.8.3",
-    "react-native": "0.59.5",
-    "react-native-code-push": "^5.6.0",
-    "react-native-splash-screen": "^3.2.0",
+    "react": "16.8.6",
+    "react-native": "0.60.4",
+    "react-native-code-push": "^5.6.1",
     "react-native-version-check": "^3.3.0",
     "rn-codepush-dialog": "../"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.3",
-    "@babel/runtime": "^7.4.3",
-    "babel-jest": "^24.7.1",
-    "jest": "^24.7.1",
-    "metro-react-native-babel-preset": "^0.53.1",
-    "react-test-renderer": "16.8.3"
+    "@babel/core": "^7.5.5",
+    "@babel/runtime": "^7.5.5",
+    "@react-native-community/eslint-config": "^0.0.5",
+    "babel-jest": "^24.8.0",
+    "eslint": "^6.1.0",
+    "jest": "^24.8.0",
+    "metro-react-native-babel-preset": "^0.55.0",
+    "react-test-renderer": "16.8.6"
   },
   "jest": {
     "preset": "react-native"

@@ -11,10 +11,13 @@ import {
   TextInput,
   Dimensions,
   AppState,
-  Linking
+  Linking,
+  DeviceEventEmitter
 } from "react-native";
 import CodePush from "react-native-code-push";
 import VersionCheck from "react-native-version-check";
+
+export const CODE_PUSH_DID_CHECK_UPDATE_EVENT = "CODE_PUSH_DID_CHECK_UPDATE";
 
 const { width, height } = Dimensions.get("window");
 const dialogWidth = width - 20;
@@ -95,10 +98,12 @@ class CodePushDialog extends React.Component {
     allowStoreCheck: true,
     storeMandatoryUpdate: true,
     isCodePushSlientUpdate: true,
-    codePushTimeoutForSlientUpdate: 30000
+    codePushTimeoutForSlientUpdate: 30000,
+    storeAppID: ""
   };
 
   componentWillMount() {
+    this.updateInProgress = true;
     CodePush.disallowRestart();
 
     CodePush.getUpdateMetadata().then(packageInfo => {
@@ -131,10 +136,13 @@ class CodePushDialog extends React.Component {
     if (isCheckOnResume && !isCodePushSlientUpdate) {
       AppState.addEventListener("change", this._handleAppStateChange);
     }
-    if (isCodePushSlientUpdate && onDidCheckUpdate) {
+    if (isCodePushSlientUpdate) {
       this.timer = setTimeout(() => {
         if (!this.updateInProgress) {
-          onDidCheckUpdate(false, this.version, this.packageInfo);
+          if (onDidCheckUpdate) {
+            onDidCheckUpdate(false, this.version, this.packageInfo);
+          }
+          DeviceEventEmitter.emit(CODE_PUSH_DID_CHECK_UPDATE_EVENT);
         }
       }, codePushTimeoutForSlientUpdate);
     }
@@ -148,39 +156,44 @@ class CodePushDialog extends React.Component {
 
   _handleAppStateChange = nextAppState => {
     if (nextAppState === "active" && this.state.state === "None") {
-      const {
-        allowStoreCheck,
-        onGetStoreInfo,
-        storeAppID: appID,
-        storeAppName: appName,
-        storeIgnoreErrors: ignoreErrors = true
-      } = this.props;
-      if (allowStoreCheck && appID !== "") {
-        let info = null;
-        let storeUrl = null;
-        VersionCheck.needUpdate()
-          .then(res => {
-            info = res;
-            onGetStoreInfo && onGetStoreInfo(res);
-            return VersionCheck.getStoreUrl({ appID, appName, ignoreErrors });
-          })
-          .then(url => {
-            if (!info.isNeeded || !url) throw Error("No need to update store, will fallback to check code push");
-            storeUrl = url;
-            return Linking.canOpenURL(url);
-          })
-          .then(canOpen => {
-            if (!canOpen) throw Error("Can't open store url, will fallback to check code push");
-            console.log("*** need update store: ", storeUrl);
-            this.setState({ storeUrl, state: "NeedStoreUpdate", showContent: true }, this._show);
-          })
-          .catch(error => {
-            console.log("**** error", error);
-            this._syncImmediate();
-          });
-      } else {
-        this._syncImmediate();
-      }
+      this._syncImmediate();
+    }
+  };
+
+  _storeCheck = remotePackage => {
+    console.log("**** Version miss match", remotePackage);
+    this.updateInProgress = true;
+    const {
+      allowStoreCheck,
+      onGetStoreInfo,
+      storeAppID: appID,
+      storeAppName: appName,
+      storeIgnoreErrors: ignoreErrors = true
+    } = this.props;
+
+    if (allowStoreCheck && appID !== "") {
+      let info = null;
+      let storeUrl = null;
+      VersionCheck.needUpdate()
+        .then(res => {
+          info = res;
+          onGetStoreInfo && onGetStoreInfo(res);
+          return VersionCheck.getStoreUrl({ appID, appName, ignoreErrors });
+        })
+        .then(url => {
+          if (!info.isNeeded || !url) throw Error("No need to update store, will fallback to check code push");
+          storeUrl = url;
+          return Linking.canOpenURL(url);
+        })
+        .then(canOpen => {
+          if (!canOpen) throw Error("Can't open store url, will fallback to check code push");
+          console.log("*** need update store: ", storeUrl);
+          this.setState({ storeUrl, state: "NeedStoreUpdate", showContent: true }, this._show);
+        })
+        .catch(error => {
+          console.log("**** error", error);
+          this._syncImmediate();
+        });
     }
   };
 
@@ -237,6 +250,7 @@ class CodePushDialog extends React.Component {
   _checkAndUpdateImmediate() {
     const { deploymentKey, onDidCheckUpdate } = this.props;
     CodePush.checkForUpdate(deploymentKey).then(update => {
+      console.log("**** Check for update: ", update);
       if (update && !update.failedInstall) {
         const { label, appVersion } = update;
         const { onGetRemotePackageInfo } = this.props;
@@ -249,6 +263,7 @@ class CodePushDialog extends React.Component {
         if (onDidCheckUpdate) {
           onDidCheckUpdate(true, this.version, this.packageInfo);
         }
+        DeviceEventEmitter.emit(CODE_PUSH_DID_CHECK_UPDATE_EVENT);
       }
     });
   }
@@ -295,7 +310,12 @@ class CodePushDialog extends React.Component {
             mandatoryInstallMode: CodePush.InstallMode.IMMEDIATE,
             deploymentKey: deploymentKey
           };
-          CodePush.sync(codePushOptions, this._codePushStatusDidChange, this._codePushDownloadDidProgress);
+          CodePush.sync(
+            codePushOptions,
+            this._codePushStatusDidChange,
+            this._codePushDownloadDidProgress,
+            this._storeCheck
+          );
         });
       } else {
         if (state !== "Syncing") {
@@ -305,7 +325,12 @@ class CodePushDialog extends React.Component {
               mandatoryInstallMode: CodePush.InstallMode.ON_NEXT_RESTART,
               deploymentKey: deploymentKey
             };
-            CodePush.sync(codePushOptions, this._codePushStatusDidChange, this._codePushDownloadDidProgress);
+            CodePush.sync(
+              codePushOptions,
+              this._codePushStatusDidChange,
+              this._codePushDownloadDidProgress,
+              this._storeCheck
+            );
           });
         }
       }
@@ -363,7 +388,7 @@ class CodePushDialog extends React.Component {
         }
         break;
     }
-
+    console.log("**** Status changed: ", syncMessage);
     if (!isCodePushSlientUpdate) {
       this.setState({ syncMessage });
     }

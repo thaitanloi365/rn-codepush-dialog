@@ -1,12 +1,22 @@
-import React, { Component } from "react";
-import { Platform, Text, View, TouchableOpacity, Alert, StyleSheet } from "react-native";
-import CodePushDialog from "rn-codepush-dialog";
-import SplashScreen from "react-native-splash-screen";
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow
+ */
 
-const instructions = Platform.select({
-  ios: "Press Cmd+R to reload,\n" + "Cmd+D or shake for dev menu",
-  android: "Double tap R on your keyboard to reload,\n" + "Shake or press menu button for dev menu"
-});
+import React, { Fragment } from "react";
+import { SafeAreaView, StyleSheet, ScrollView, View, Text, StatusBar, Platform } from "react-native";
+
+import {
+  Header,
+  LearnMoreLinks,
+  Colors,
+  DebugInstructions,
+  ReloadInstructions
+} from "react-native/Libraries/NewAppScreen";
+import CodePushDialog from "rn-codepush-dialog";
 
 const isIOS = Platform.OS === "ios";
 const productionKey_iOS = "Wr7cgCTDbWfOzv1yTWwAghrPZxrXSk58Wfin4";
@@ -20,64 +30,93 @@ const productionKey = isIOS ? productionKey_iOS : productionKey_android;
 
 const deploymentKey = __DEV__ ? stagingKey : productionKey;
 
-export default class App extends Component {
-  state = {
-    packageVersion: "",
-    packageInfo: null
-  };
-  componentDidMount() {
-    SplashScreen.hide();
-  }
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native 9!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        {this.state.packageInfo !== null && (
-          <Text style={styles.instructions}>{JSON.stringify(this.state.packageInfo)}</Text>
-        )}
-        <Text style={styles.instructions}>{"version: " + this.state.packageVersion}</Text>
-        <CodePushDialog
-          isCheckOnResume
-          deploymentKey={deploymentKey}
-          onGetCurrentPackageInfo={(packageVersion, packageInfo) => {
-            console.log("onGetCurrentPackageInfo", { packageVersion }, packageInfo);
-            this.setState({ packageVersion });
-          }}
-          onGetRemotePackageInfo={(packageVersion, packageInfo) => {
-            console.log("onGetRemotePackageInfo", { packageVersion }, packageInfo);
-            this.setState({ packageVersion });
-          }}
-        />
-        <TouchableOpacity
-          onPress={() => {
-            if (this.state.packageInfo) {
-              Alert.alert("Package info", JSON.stringify(this.state.packageInfo));
-            }
-          }}
-        >
-          <Text>show package information</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-}
+const App = () => {
+  return (
+    <Fragment>
+      <StatusBar barStyle="dark-content" />
+      <SafeAreaView>
+        <ScrollView contentInsetAdjustmentBehavior="automatic" style={styles.scrollView}>
+          <Header />
+          {global.HermesInternal == null ? null : (
+            <View style={styles.engine}>
+              <Text style={styles.footer}>Engine: Hermes</Text>
+            </View>
+          )}
+          <View style={styles.body}>
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Step One</Text>
+              <Text style={styles.sectionDescription}>
+                Edit <Text style={styles.highlight}>App.js</Text> to change this screen and then come back to see your
+                edits.
+              </Text>
+            </View>
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>See Your Changes</Text>
+              <Text style={styles.sectionDescription}>
+                <ReloadInstructions />
+              </Text>
+            </View>
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Debug</Text>
+              <Text style={styles.sectionDescription}>
+                <DebugInstructions />
+              </Text>
+            </View>
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Learn More</Text>
+              <Text style={styles.sectionDescription}>Read the docs to discover what to do next:</Text>
+            </View>
+            <LearnMoreLinks />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+      <CodePushDialog
+        deploymentKey={deploymentKey}
+        onDidCheckUpdate={(isLatest, version, packageInfo) => {
+          console.log({ isLatest, version, packageInfo });
+        }}
+      />
+    </Fragment>
+  );
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5FCFF"
+  scrollView: {
+    backgroundColor: Colors.lighter
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: "center",
-    margin: 10
+  engine: {
+    position: "absolute",
+    right: 0
   },
-  instructions: {
-    textAlign: "center",
-    color: "#333333",
-    marginBottom: 5
+  body: {
+    backgroundColor: Colors.white
+  },
+  sectionContainer: {
+    marginTop: 32,
+    paddingHorizontal: 24
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: Colors.black
+  },
+  sectionDescription: {
+    marginTop: 8,
+    fontSize: 18,
+    fontWeight: "400",
+    color: Colors.dark
+  },
+  highlight: {
+    fontWeight: "700"
+  },
+  footer: {
+    color: Colors.dark,
+    fontSize: 12,
+    fontWeight: "600",
+    padding: 4,
+    paddingRight: 12,
+    textAlign: "right"
   }
 });
+
+export default App;
