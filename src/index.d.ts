@@ -122,4 +122,6 @@ declare module "rn-codepush-dialog" {
   }
 
   export default class CodePushDialog extends React.Component<CodePushDialogProps, any> {}
+
+  export const CODE_PUSH_DID_CHECK_UPDATE_EVENT;
 }
