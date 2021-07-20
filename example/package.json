@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "react": "16.8.6",
-    "react-native": "0.60.4",
+    "react-native": "0.62.3",
     "react-native-code-push": "^5.6.1",
     "react-native-version-check": "^3.3.0",
     "rn-codepush-dialog": "../"
